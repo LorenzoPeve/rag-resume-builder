@@ -77,7 +77,7 @@ legend.
     assert c2.startswith('rick Tont Woods on\nDecember 30,')
 
 
-def test_chunkenize_text_very_long_text():
+def test_chunkenize_text_very_long():
 
     with open(TEST_FILE, "r") as f:
         text = f.read()
@@ -86,4 +86,46 @@ def test_chunkenize_text_very_long_text():
     chunks = e._chunkenize_text()
 
     assert type(chunks) == list
-    assert len(chunks[0]) == 8000
+    assert len(chunks) == 3
+
+
+def test_get_embeddings():
+
+    text = """
+Tiger Woods, widely regarded as one of the greatest golfers of all time,
+has left an indelible mark on the sport. Born Eldrick Tont Woods on
+December 30, 1975, he became a prodigy at a young age, making waves in
+the golfing world with his incredible talent and determination. Woods
+turned professional in 1996 and quickly dominated the sport, earning
+numerous accolades, including 15 major championships and a
+record-tying 82 PGA Tour wins. His impact extended beyond the course,
+as he became a global icon, inspiring a new generation of golfers and
+breaking down barriers in a sport long associated with exclusivity.
+Despite facing significant challenges, including injuries and
+personal setbacks, Woods made an astonishing comeback by winning the
+2019 Masters, a moment that solidified his legacy. His influence on
+golf and sports, in general, remains unparalleled, making him a true
+legend.
+    """
+
+    text = text.strip()
+    e = embeddings.Embeddings(text)
+    vectors = e.get_embeddings()
+    assert len(vectors) == 1
+    assert len(vectors[0]) == 2
+    assert type(vectors[0][0]) == str
+    assert type(vectors[0][1]) == list
+    assert len(vectors[0][1]) == 1536
+
+def test_get_embeddings_long():
+
+    with open(TEST_FILE, "r") as f:
+        text = f.read()
+
+    e = embeddings.Embeddings(text, chunk_size=8000)
+    vectors = e.get_embeddings()
+    assert len(vectors) == 3
+    assert len(vectors[0]) == 2
+    assert type(vectors[0][0]) == str
+    assert type(vectors[0][1]) == list
+    assert len(vectors[0][1]) == 1536
