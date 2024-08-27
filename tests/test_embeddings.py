@@ -129,3 +129,18 @@ def test_get_embeddings_long():
     assert type(vectors[0][0]) == str
     assert type(vectors[0][1]) == list
     assert len(vectors[0][1]) == 1536
+
+
+def test_get_embeddings_long_diff_size():
+
+    with open(TEST_FILE, "r") as f:
+        text = f.read()
+
+    e = embeddings.Embeddings(text, chunk_size=500)
+    vectors = e.get_embeddings()
+
+    assert len(vectors) == 44
+    assert len(vectors[0]) == 2
+    assert type(vectors[0][0]) == str
+    assert type(vectors[0][1]) == list
+    assert len(vectors[0][1]) == 1536
