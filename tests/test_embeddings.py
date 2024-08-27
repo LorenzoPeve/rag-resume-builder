@@ -89,7 +89,7 @@ def test_chunkenize_text_very_long():
     assert len(chunks) == 3
 
 
-def test_get_embeddings():
+def test_get_text_and_embeddings():
 
     text = """
 Tiger Woods, widely regarded as one of the greatest golfers of all time,
@@ -110,20 +110,20 @@ legend.
 
     text = text.strip()
     e = embeddings.Embeddings(text)
-    vectors = e.get_embeddings()
+    vectors = e.get_text_and_embeddings()
     assert len(vectors) == 1
     assert len(vectors[0]) == 2
     assert type(vectors[0][0]) == str
     assert type(vectors[0][1]) == list
     assert len(vectors[0][1]) == 1536
 
-def test_get_embeddings_long():
+def test_get_text_and_embeddings_long():
 
     with open(TEST_FILE, "r") as f:
         text = f.read()
 
     e = embeddings.Embeddings(text, chunk_size=8000)
-    vectors = e.get_embeddings()
+    vectors = e.get_text_and_embeddings()
     assert len(vectors) == 3
     assert len(vectors[0]) == 2
     assert type(vectors[0][0]) == str
@@ -131,13 +131,13 @@ def test_get_embeddings_long():
     assert len(vectors[0][1]) == 1536
 
 
-def test_get_embeddings_long_diff_size():
+def test_get_text_and_embeddings_long_diff_size():
 
     with open(TEST_FILE, "r") as f:
         text = f.read()
 
     e = embeddings.Embeddings(text, chunk_size=500)
-    vectors = e.get_embeddings()
+    vectors = e.get_text_and_embeddings()
 
     assert len(vectors) == 44
     assert len(vectors[0]) == 2
