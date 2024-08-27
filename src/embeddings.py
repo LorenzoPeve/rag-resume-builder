@@ -5,6 +5,7 @@ import tiktoken
 
 load_dotenv()
 
+EMBEDDING_MODEL_NAME = os.getenv('EMBEDDING_MODEL_NAME')
 TOKEN_LIMIT = os.getenv('EMBEDDING_TOKEN_LIMIT')
 ENCODER = os.getenv('ENCODER_MODEL_NAME')
 
@@ -65,16 +66,26 @@ class Embeddings:
         return chunks
 
 
+    def get_embeddings(self) -> list[tuple]:
+        """
+        Returns vector embeddings for the given text breaking the text into
+        chunks.
 
+        Returns:
+            list[tuple]: A list of tuples where each tuple contains the
+                embeddings for a chunk of the text. Each tuple is in the form
+                (text, embedding) where `embedding` is a list of floats.
+        """
+        e = Embeddings(self.text)
+        self.chunks = e._chunkenize_text()
+        embeddings = []
 
+        for chunk in self.chunks:
+            response = e.client.embeddings.create(
+                model=EMBEDDING_MODEL_NAME,
+                input=chunk
+            )
 
+            embeddings.append((chunk, response.data[0].embedding))
 
-
-
-    def get_embeddings(text):
-        response = client.embeddings.create(
-            input=text,
-            model="text-embedding-3-small"
-        )
-        return response
-
+        return embeddings
