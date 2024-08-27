@@ -42,7 +42,7 @@ class Embeddings:
         """Splits the text into chunks according to chunk_size."""
         encoding = tiktoken.get_encoding(ENCODER)
         tokens = encoding.encode(self.text)
-    
+
         if len(tokens) <= self.chunk_size:
             return [self.text]
         else:
@@ -76,12 +76,11 @@ class Embeddings:
                 embeddings for a chunk of the text. Each tuple is in the form
                 (text, embedding) where `embedding` is a list of floats.
         """
-        e = Embeddings(self.text)
-        self.chunks = e._chunkenize_text()
+        self.chunks = self._chunkenize_text()
         embeddings = []
 
         for chunk in self.chunks:
-            response = e.client.embeddings.create(
+            response = self.client.embeddings.create(
                 model=EMBEDDING_MODEL_NAME,
                 input=chunk
             )
