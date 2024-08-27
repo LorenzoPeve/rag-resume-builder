@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from src import embeddings
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Get embeddings
 with open(os.path.join(os.path.dirname(__file__), "shakespeare.txt")) as f:
@@ -36,7 +36,8 @@ with conn as conn:
         CREATE TABLE records (
             id bigserial PRIMARY KEY,
             text VARCHAR,
-            embedding vector(1536)
+            embedding vector(1536),
+            search_text tsvector GENERATED ALWAYS AS (to_tsvector('english', text)) STORED
         );
     """)
     insert_query = """
