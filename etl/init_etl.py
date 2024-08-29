@@ -24,31 +24,30 @@ conn = psycopg.connect(
     user=os.getenv('DB_USER'),
     password=os.getenv('DB_PASSWORD'),
 )
-print(type(conn))
 cur = conn.cursor()
-print(type(cur))
 
 # Create tables and load records
 with conn as conn:
     cur = conn.cursor()
     cur.execute("""
-        DROP SCHEMA public CASCADE;
+        DROP SCHEMA IF EXISTS public CASCADE;
         CREATE SCHEMA public;
         
         CREATE EXTENSION IF NOT EXISTS vector with SCHEMA public;
 
-        CREATE TABLE records (
+        CREATE TABLE documents (
             id bigserial PRIMARY KEY,
-            text VARCHAR,
+            content VARCHAR,
             embedding vector(1536),
-            search_text tsvector GENERATED ALWAYS AS (to_tsvector('english', text)) STORED
+            search_text tsvector GENERATED ALWAYS AS (to_tsvector('english', content)) STORED
         );
                 
-        CREATE INDEX vector_hnsw_index ON records USING hnsw (embedding vector_cosine_ops);
+        CREATE INDEX vector_hnsw_index ON documents USING hnsw (embedding vector_cosine_ops);
+        CREATE INDEX search_text_index ON documents USING GIN (search_text);
         SET maintenance_work_mem = '1GB';
     """)
     insert_query = """
-    INSERT INTO records (text, embedding) VALUES (%s, %s)
+    INSERT INTO documents (content, embedding) VALUES (%s, %s)
     """
     cur.executemany(insert_query, vectors)
     
